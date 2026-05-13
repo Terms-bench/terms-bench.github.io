@@ -20,29 +20,43 @@
       }
     })();
   </script>
-  <link rel="stylesheet" href="style.css?v=20260512-bankroll-arxiv" />
+  <link rel="stylesheet" href="style.css?v=20260512-paper-link" />
 </head>
 <body>
-  <button class="theme-toggle" id="theme-toggle" type="button"
-          aria-label="Toggle color theme" title="Toggle light / dark">
-    <svg class="theme-icon theme-sun" viewBox="0 0 24 24" aria-hidden="true">
-      <circle cx="12" cy="12" r="4" fill="currentColor"></circle>
-      <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none">
-        <line x1="12" y1="2.5" x2="12" y2="5"></line>
-        <line x1="12" y1="19" x2="12" y2="21.5"></line>
-        <line x1="2.5" y1="12" x2="5" y2="12"></line>
-        <line x1="19" y1="12" x2="21.5" y2="12"></line>
-        <line x1="4.8" y1="4.8" x2="6.6" y2="6.6"></line>
-        <line x1="17.4" y1="17.4" x2="19.2" y2="19.2"></line>
-        <line x1="4.8" y1="19.2" x2="6.6" y2="17.4"></line>
-        <line x1="17.4" y1="6.6" x2="19.2" y2="4.8"></line>
-      </g>
-    </svg>
-    <svg class="theme-icon theme-moon" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"
-            fill="currentColor"></path>
-    </svg>
-  </button>
+  <div class="top-actions" aria-label="Site actions">
+    <a class="paper-link" href="TERMS_Bench.pdf" target="_blank" rel="noopener"
+       aria-label="Open TERMS-Bench paper">
+      <svg class="paper-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 3.5h7.4L19 8.1v12.4H7z" fill="none" stroke="currentColor"
+              stroke-width="1.6" stroke-linejoin="round"></path>
+        <path d="M14 3.5V8h5" fill="none" stroke="currentColor"
+              stroke-width="1.6" stroke-linejoin="round"></path>
+        <path d="M10 12h6M10 15h6M10 18h4" fill="none" stroke="currentColor"
+              stroke-width="1.6" stroke-linecap="round"></path>
+      </svg>
+      <span>Paper</span>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" type="button"
+            aria-label="Toggle color theme" title="Toggle light / dark">
+      <svg class="theme-icon theme-sun" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="4" fill="currentColor"></circle>
+        <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none">
+          <line x1="12" y1="2.5" x2="12" y2="5"></line>
+          <line x1="12" y1="19" x2="12" y2="21.5"></line>
+          <line x1="2.5" y1="12" x2="5" y2="12"></line>
+          <line x1="19" y1="12" x2="21.5" y2="12"></line>
+          <line x1="4.8" y1="4.8" x2="6.6" y2="6.6"></line>
+          <line x1="17.4" y1="17.4" x2="19.2" y2="19.2"></line>
+          <line x1="4.8" y1="19.2" x2="6.6" y2="17.4"></line>
+          <line x1="17.4" y1="6.6" x2="19.2" y2="4.8"></line>
+        </g>
+      </svg>
+      <svg class="theme-icon theme-moon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"
+              fill="currentColor"></path>
+      </svg>
+    </button>
+  </div>
   <main class="container">
     <!-- =============================================================== Hero -->
     <header class="hero">
