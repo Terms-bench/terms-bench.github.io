@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TERMS-Bench — Diagnostic benchmark for LLM negotiation agents</title>
+  <script>
+    // Resolve the theme before first paint so we never flash the wrong palette.
+    (function () {
+      try {
+        var saved = localStorage.getItem('terms-theme');
+        var theme = saved || (
+          window.matchMedia &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark' : 'light'
+        );
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="style.css?v=20260512-bankroll-arxiv" />
+</head>
+<body>
+  <button class="theme-toggle" id="theme-toggle" type="button"
+          aria-label="Toggle color theme" title="Toggle light / dark">
+    <svg class="theme-icon theme-sun" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="4" fill="currentColor"></circle>
+      <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none">
+        <line x1="12" y1="2.5" x2="12" y2="5"></line>
+        <line x1="12" y1="19" x2="12" y2="21.5"></line>
+        <line x1="2.5" y1="12" x2="5" y2="12"></line>
+        <line x1="19" y1="12" x2="21.5" y2="12"></line>
+        <line x1="4.8" y1="4.8" x2="6.6" y2="6.6"></line>
+        <line x1="17.4" y1="17.4" x2="19.2" y2="19.2"></line>
+        <line x1="4.8" y1="19.2" x2="6.6" y2="17.4"></line>
+        <line x1="17.4" y1="6.6" x2="19.2" y2="4.8"></line>
+      </g>
+    </svg>
+    <svg class="theme-icon theme-moon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"
+            fill="currentColor"></path>
+    </svg>
+  </button>
+  <main class="container">
+    <!-- =============================================================== Hero -->
+    <header class="hero">
+      <div class="hero-top">
+        <div class="hero-eyebrow">Eval · Bilateral price negotiation</div>
+        <h1 class="wordmark">TERMS-Bench</h1>
+        <p class="tagline">A diagnostic benchmark for LLM negotiation agents.</p>
+        <p class="hero-pitch">
+          Each agent plays multi-round alternating-offer episodes against a
+          fixed, history-reactive counterpart across three regimes and six
+          behavioral families. Metrics are computed programmatically from
+          logged actions and reported along four orthogonal diagnostic
+          axes&nbsp;— no human or LLM judge, no composite score.
+        </p>
+      </div>
+      <div class="hero-meta">
+        <span class="meta-item"><span class="meta-label">Run</span><span class="meta-value" id="meta-run">—</span></span>
+        <span class="meta-item"><span class="meta-label">Generated</span><span class="meta-value" id="meta-date">—</span></span>
+        <span class="meta-item"><span class="meta-label">Agents</span><span class="meta-value" id="meta-agents">—</span></span>
+      </div>
+    </header>
+
+    <nav class="page-toc" id="page-toc" aria-label="On this page">
+      <ul class="page-toc-list">
+        <li><a href="#how-it-works">How it works</a></li>
+        <li id="page-toc-li-commerce" hidden>
+          <a href="#commerce-section">Commerce</a>
+        </li>
+        <li id="page-toc-li-bankroll" hidden>
+          <a href="#bankroll-section">Bankroll</a>
+        </li>
+        <li><a href="#section-family">Family profile</a></li>
+        <li><a href="#section-difficulty">Difficulty</a></li>
+        <li><a href="#leaderboard-section">Leaderboard</a></li>
+        <li><a href="#section-pg-robustness">Data-grounded robustness</a></li>
+        <li><a href="#diagnostics-section">Diagnostics</a></li>
+        <li><a href="fingerprints.html" class="page-toc-external">Bargaining fingerprints &rarr;</a></li>
+        <li class="page-toc-soon" aria-disabled="true">
+          <span class="page-toc-soon-label">Submit your model</span>
+          <span class="page-toc-soon-tag">coming soon</span>
+        </li>
+        <li><a href="#prompt-section">Agent contract</a></li>
+        <li><a href="#traces-section">Traces</a></li>
+        <li><a href="#metrics-definitions">Metrics</a></li>
+      </ul>
+    </nav>
+
+    <!-- =================================================== How it works ---- -->
+    <section class="howto-section" id="how-it-works">
+      <header class="section-head">
+        <h2>How it works</h2>
+        <p class="section-caption">
+          TERMS-Bench is a simulator-based benchmark: the counterpart is a
+          fixed stochastic policy — not a second language model — so every
+          episode is reproducible from a seed and comparisons across agents
+          are clean.
+        </p>
+      </header>
+      <ol class="howto-steps">
+        <li>
+          <h3>1 &middot; Game</h3>
+          <p>
+            A single bilateral price negotiation for one item. Each side holds
+            a private type <code>t = (r, κ, η)</code> — reservation price,
+            urgency, stance — drawn from a regime-conditioned prior.
+            Surplus is realized only if the agreed price lies inside the
+            ZOPA <code>[r<sub>seller</sub>, r<sub>buyer</sub>]</code>.
+          </p>
+        </li>
+        <li>
+          <h3>2 &middot; Protocol</h3>
+          <p>
+            Alternating offers over up to <code>K = 10</code> rounds. Each
+            turn the agent receives the counterpart's price plus a
+            <em>sentiment</em> and a <em>stance cue</em>, then returns
+            <code>Offer(price, message)</code>, <code>Accept</code>, or
+            <code>Reject</code>. Price bounds, monotonic concession, and
+            the turn budget are enforced by the environment.
+          </p>
+        </li>
+        <li>
+          <h3>3 &middot; Counterpart</h3>
+          <p>
+            A stochastic policy parameterised by <code>(α, β, γ, ρ, ξ, λ…)</code>.
+            Its acceptance and concession rules are
+            <em>history-reactive</em>: they penalise fast concessions (to
+            exploit eager agents) and reward rigidity (to break deadlocks).
+            Cues are emitted from stance- and proximity-conditioned
+            distributions.
+          </p>
+        </li>
+        <li>
+          <h3>4 &middot; Metrics</h3>
+          <p>
+            Four orthogonal diagnostic axes: <strong>Surplus</strong>
+            (<code>SE⁺</code>, <code>CSE⁺</code>), <strong>Agreement
+            calibration</strong> (<code>AGR⁺</code>, <code>FAGR⁻</code>),
+            <strong>Opponent modelling</strong> (<code>BE<sub>type</sub></code>),
+            and <strong>Procedural robustness</strong> (<code>CritViol%</code>).
+            We report them separately — no composite score.
+          </p>
+        </li>
+        <li>
+          <h3>5 &middot; Difficulty grader</h3>
+          <p>
+            Each episode is scored by a structural grader that combines ZOPA
+            tightness, urgency pressure, stance compatibility, and deadline
+            proximity into a single <code>env_score ∈ [0, 1]</code>. Episodes
+            are bucketed into five equal-mass bins so the headline chart
+            traces degradation as negotiations become structurally harder.
+          </p>
+        </li>
+        <li>
+          <h3>6 &middot; Commerce mode</h3>
+          <p>
+            Each scenario can also carry unit economics — a resale value, a
+            fulfillment cost, a margin floor — so the negotiated price maps
+            directly to dollars of profit. Two perspectives are evaluated:
+            <strong>Merchant</strong> (agent buys from a supplier) and
+            <strong>Vendor</strong> (agent sells to a customer). The diagnostic
+            axes above are unchanged; the dollar view is shown alongside in
+            the next section.
+          </p>
+        </li>
+        <li>
+          <h3>7 &middot; Bankroll mode</h3>
+          <p>
+            A stateful sibling to commerce. Instead of evaluating each
+            negotiation independently, the agent runs 4 merchant-side
+            sessions against a fixed pool of suppliers, each session
+            starting with a $100 bankroll and running for 50 negotiation
+            periods. Cash balance carries forward within a session;
+            hard ruin would terminate the chain if cash crossed the $0
+            bankruptcy threshold. The headline is <strong>terminal
+            balance</strong> after the 50-period chain.
+          </p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ============================================ TERMS-Commerce subsection -->
+    <section class="commerce-section" id="commerce-section" hidden>
+      <header class="section-head">
+        <h2>TERMS-Commerce <span class="section-eyebrow">profit leaderboard</span></h2>
+        <p class="section-caption">
+          The same negotiation kernel as above, scored in dollars. Profit is a
+          deterministic post-hoc transformation of the agreed price using
+          per-episode unit economics.
+          <strong>Merchant</strong>: <code>profit = units · (resale − price − fulfillment) − overhead</code>.
+          <strong>Vendor</strong>: <code>profit = units · (price − cogs − sales_overhead) − overhead</code>.
+          A no-deal returns the outside option (default $0); a deal struck
+          past the agent's reservation surfaces as real money lost (negative
+          profit, never clipped).
+        </p>
+        <p class="section-caption commerce-caveat">
+          <strong>Statistical scope.</strong> Each episode is an independent
+          bilateral negotiation; total profit is a sum of i.i.d. realisations
+          and admits standard SEM aggregation. Path-dependent dynamics —
+          chained cash balance, inventory, ruin — are evaluated separately
+          in the <a href="#bankroll-section">bankroll view</a> below.
+        </p>
+      </header>
+
+      <div class="controls">
+        <div class="control-group" role="tablist" aria-label="Commerce data source">
+          <span class="control-label">Data source</span>
+          <div class="pill-group" id="commerce-source-pills"></div>
+        </div>
+        <div class="control-group" role="tablist" aria-label="Commerce perspective filter">
+          <span class="control-label">Perspective</span>
+          <div class="pill-group" id="commerce-perspective-pills"></div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="leaderboard" id="commerce-leaderboard">
+          <thead>
+            <tr>
+              <th class="col-rank">#</th>
+              <th class="col-agent">Agent</th>
+              <th class="col-provider">Provider</th>
+              <th class="num" title="Total profit summed across episodes (USD)">
+                Total profit
+              </th>
+              <th class="num" title="Average profit per episode (USD)">
+                Avg / ep.
+              </th>
+              <th class="num" title="Average gross margin rate over agreement episodes">
+                Avg margin
+              </th>
+              <th class="num" title="Share of episodes where the agent realised negative profit (lower is better)">
+                Neg. profit %
+              </th>
+              <th class="num" title="On infeasible episodes only: share where the agent walked away (higher is better)">
+                Walk-away %
+              </th>
+              <th class="num" title="Average money left on table on feasible episodes (USD; lower is better)">
+                Money left
+              </th>
+              <th class="num" title="Total money left on table relative to total best-feasible profit (1 − capture rate). Scale-invariant; comparable across runs.">
+                Regret %
+              </th>
+              <th class="num">Episodes</th>
+            </tr>
+          </thead>
+          <tbody id="commerce-leaderboard-body"></tbody>
+        </table>
+      </div>
+      <p class="section-footnote" id="commerce-footnote"></p>
+    </section>
+
+    <!-- ============================================ TERMS-Bankroll subsection -->
+    <section class="bankroll-section" id="bankroll-section" hidden>
+      <header class="section-head">
+        <h2>TERMS-Bankroll <span class="section-eyebrow">stateful procurement chains</span></h2>
+        <p class="section-caption">
+          Each agent plays 4 merchant-side sessions against a fixed pool
+          of suppliers. Every session starts with a $100 bankroll and
+          runs for 50 negotiation periods; cash balance carries forward
+          within the session. <strong>Terminal balance</strong> after
+          the 50-period chain is the headline. A session ends early
+          only if cash falls below the $0 bankruptcy threshold (hard
+          ruin); subsequent periods produce $0 profit and time-to-ruin
+          is recorded.
+        </p>
+        <p class="section-caption commerce-caveat">
+          This release uses the supplier-pool setup: each period the
+          merchant draws a supplier from a fixed pool of counterparts,
+          with no inventory carryover and a $0 bankruptcy threshold.
+          The table compares the LLM panel on the same bankroll
+          geometry.
+        </p>
+      </header>
+
+      <div class="controls">
+        <div class="control-group" role="tablist" aria-label="Bankroll data source">
+          <span class="control-label">Data source</span>
+          <div class="pill-group" id="bankroll-source-pills"></div>
+        </div>
+        <div class="control-group" role="tablist" aria-label="Bankroll supplier mode">
+          <span class="control-label">Supplier mode</span>
+          <div class="pill-group" id="bankroll-mode-pills"></div>
+        </div>
+      </div>
+
+      <figure class="bankroll-chart-block" id="bankroll-chart-block">
+        <figcaption>
+          <h3 class="bankroll-chart-title">Cash balance over time</h3>
+          <p class="bankroll-chart-sub">
+            Stateful cash balance per period across 4 sessions per agent.
+            Each line is the mean (or median, in IQR mode) and the
+            shaded ribbon is its uncertainty (mean ± SEM, or p25–p75).
+            Hover or scrub to spotlight a single agent at a specific
+            period; click to pin. Tap the play button for a race-replay
+            and watch the right-edge ladder re-rank as cash accumulates.
+            The dashed line marks the starting bankroll; the dotted line
+            marks the bankruptcy threshold.
+          </p>
+        </figcaption>
+        <div class="chart-wrap" id="chart-bankroll"></div>
+      </figure>
+
+      <div class="table-wrap">
+        <table class="leaderboard" id="bankroll-leaderboard">
+          <thead>
+            <tr>
+              <th class="col-rank">#</th>
+              <th class="col-agent">Agent</th>
+              <th class="col-provider">Provider</th>
+              <th class="num" title="Mean cash balance at horizon end across N sessions (USD)">
+                Terminal $
+              </th>
+              <th class="num" title="Standard error of the mean across sessions">
+                ± SEM
+              </th>
+              <th class="num" title="Mean profit per period (terminal − starting) ÷ horizon">
+                Avg / period
+              </th>
+              <th class="num" title="Share of sessions that reached the horizon without ruin">
+                Survival
+              </th>
+              <th class="num" title="Median period of ruin among bankrupt sessions; — if all survived">
+                Ruin @
+              </th>
+              <th class="num" title="Mean per-session worst peak-to-trough cash drop (USD)">
+                Max DD
+              </th>
+              <th class="num col-memory-premium" title="Mean stateful terminal balance minus memoryless replay on the same chain. Positive ⇒ uses ledger state.">
+                Memory premium
+              </th>
+              <th class="num col-memory-premium" title="Standard error on the per-session memory-premium delta">
+                ± SEM
+              </th>
+              <th class="num">Sessions</th>
+            </tr>
+          </thead>
+          <tbody id="bankroll-leaderboard-body"></tbody>
+        </table>
+      </div>
+      <p class="section-footnote" id="bankroll-footnote"></p>
+    </section>
+
+    <!-- =================================================== Chart A: family -->
+    <section class="chart-section" id="section-family">
+      <header class="section-head">
+        <h2>Surplus efficiency by counterpart family</h2>
+        <p class="section-caption">
+          Feasible surplus efficiency (<code>SE⁺</code>) across the six
+          counterpart behavioral families, shown as a single profile
+          overview: one polygon per agent, with the distance along each
+          spoke encoding that agent's SE⁺ on that family. Broadly inflated
+          shapes are robust generalists; sharply asymmetric shapes reveal
+          which families an agent leans on (clean cues vs noise vs
+          adversarial pressure). Hover a polygon for that agent's full
+          profile read-out, or hover near a spoke for the family's leaderboard
+          ranking; click anything to pin the focus.
+        </p>
+      </header>
+      <div class="chart-controls">
+        <div class="control-group" role="tablist" aria-label="Kind filter">
+          <span class="control-label">Kind</span>
+          <div class="pill-group" id="family-kind-pills"></div>
+        </div>
+      </div>
+      <div class="chart-wrap" id="chart-family"></div>
+      <p class="section-footnote" id="chart-family-footnote"></p>
+    </section>
+
+    <!-- =============================================== Chart B: difficulty -->
+    <section class="chart-section" id="section-difficulty">
+      <header class="section-head">
+        <h2>Surplus efficiency by environment difficulty</h2>
+        <p class="section-caption">
+          Episodes are graded into five equal-mass difficulty bins by the
+          paper-aligned structural grader, combining ZOPA tightness, private
+          pressure, and stance compatibility. Each row is one agent; cell
+          brightness encodes SE⁺, so reading left→right shows each row fading
+          as negotiations get structurally harder. The rightmost column
+          summarises the easy→hard drop in percent.
+        </p>
+      </header>
+      <div class="chart-controls">
+        <div class="control-group" role="tablist" aria-label="Kind filter">
+          <span class="control-label">Kind</span>
+          <div class="pill-group" id="difficulty-kind-pills"></div>
+        </div>
+      </div>
+      <div class="chart-wrap" id="chart-difficulty"></div>
+      <p class="section-footnote" id="chart-difficulty-footnote"></p>
+    </section>
+
+    <!-- ======================================================== Leaderboard -->
+    <section class="board-section" id="leaderboard-section">
+      <header class="section-head">
+        <h2>Current leaderboard</h2>
+        <p class="section-caption">
+          Per-agent paper-aligned metrics. Toggle regime to see regime-specific
+          performance. <code>FAGR⁻</code> and critical-violation rates are only
+          reported on the latest schema; cells are empty when an agent
+          pre-dates that instrumentation.
+        </p>
+      </header>
+
+      <div class="controls">
+        <div class="control-group" role="tablist" aria-label="Regime filter">
+          <span class="control-label">Regime</span>
+          <div class="pill-group" id="regime-pills"></div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="leaderboard" id="leaderboard">
+          <thead>
+            <tr>
+              <th class="col-rank">#</th>
+              <th class="col-agent">Agent</th>
+              <th class="col-provider">Provider</th>
+              <th class="sortable num" data-key="se_plus" title="Feasible surplus efficiency">
+                SE⁺ <span class="sort-indicator"></span>
+              </th>
+              <th class="sortable num" data-key="agr_plus" title="Feasible agreement rate">
+                AGR⁺ <span class="sort-indicator"></span>
+              </th>
+              <th class="sortable num" data-key="cse_plus" title="Conditional feasible surplus efficiency">
+                CSE⁺ <span class="sort-indicator"></span>
+              </th>
+              <th class="sortable num" data-key="fagr_minus" title="No-deal false agreement rate (lower is better)">
+                FAGR⁻ <span class="sort-indicator"></span>
+              </th>
+              <th class="sortable num" data-key="be_type" title="Aggregate belief error over counterpart type (lower is better)">
+                BE<sub>type</sub> <span class="sort-indicator"></span>
+              </th>
+              <th class="sortable num" data-key="crit_viol_pct" title="Critical protocol violation rate (lower is better)">
+                CritViol% <span class="sort-indicator"></span>
+              </th>
+              <th class="sortable num" data-key="mean_utility" title="Raw mean utility, scale-dependent">
+                Ū <span class="sort-indicator"></span>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-body"></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="pagination-row"></div>
+    </section>
+
+    <!-- =========================================== Data-grounded robustness -->
+    <section class="pg-robustness-section" id="section-pg-robustness">
+      <header class="section-head">
+        <h2>Data-grounded robustness</h2>
+        <p class="section-caption">
+          The leaderboard above is the canonical TERMS-Bench-v1 ranking.
+          As a robustness check, we re-evaluate eleven of the agents on a
+          <strong>data-grounded variant</strong> in which the ZOPA
+          distribution and observable product context come from a real
+          catalog (AmazonHistoryPrice) rather than the synthetic price
+          geometry. The data-grounded ZOPA distribution shifts the
+          absolute numbers, but rank order is largely preserved
+          (Spearman&nbsp;&rho;&nbsp;&equals;&nbsp;0.90,
+          <em>p</em>&nbsp;&lt;&nbsp;10<sup>&minus;3</sup>). The
+          cross-suite shift is structured: stronger models tend to gain
+          under data grounding, weaker models tend to lose, and the two
+          structural penalties from the paper's Findings 2 and 3
+          (cue-use, latent-type inference) replicate.
+        </p>
+      </header>
+
+      <div class="pg-chart-block">
+        <h3 class="pg-chart-title">Synthetic &rarr; data-grounded SE&plus; shift</h3>
+        <div class="chart-wrap" id="chart-pg-shift"></div>
+        <p class="pg-chart-caption" id="chart-pg-shift-caption">
+          Each line connects one agent's synthetic SE&plus; (left) to its
+          data-grounded SE&plus; (right). Lines are coloured green when
+          the agent gains, pink when it loses, and grey otherwise.
+          Hover a line to spotlight one agent.
+        </p>
+      </div>
+
+      <div class="pg-chart-block">
+        <h3 class="pg-chart-title">Data-grounded SE&plus; ranking</h3>
+        <div class="chart-wrap" id="chart-pg-ranking"></div>
+        <p class="pg-chart-caption" id="chart-pg-ranking-caption">
+          Per-model data-grounded SE&plus;, sorted descending. Bars are
+          coloured by tier (frontier / open-weight / sub-frontier);
+          provider mark sits above each bar. Hover a bar to spotlight
+          one agent.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================================================== Diagnostics -->
+    <section class="diag-section" id="diagnostics-section">
+      <header class="section-head">
+        <h2>Diagnostics</h2>
+        <p class="section-caption">
+          Four per-agent scatters across the four orthogonal axes. Each dot
+          is one agent evaluated on the <em>Overall</em> slice of the
+          selected run. Optimal corners are annotated on each panel.
+        </p>
+      </header>
+      <div class="chart-controls">
+        <div class="control-group" role="tablist" aria-label="Kind filter">
+          <span class="control-label">Kind</span>
+          <div class="pill-group" id="diag-kind-pills"></div>
+        </div>
+      </div>
+      <div class="diag-grid">
+        <figure class="diag-cell">
+          <figcaption class="diag-title">Agreement vs. Surplus</figcaption>
+          <figcaption class="diag-sub">AGR⁺ (x) × SE⁺ (y) — top-right is ideal.</figcaption>
+          <div class="chart-wrap" id="scatter-agr-se"></div>
+        </figure>
+        <figure class="diag-cell">
+          <figcaption class="diag-title">Opponent modelling vs. Surplus</figcaption>
+          <figcaption class="diag-sub">BE<sub>type</sub> (x, lower is better) × SE⁺ (y).</figcaption>
+          <div class="chart-wrap" id="scatter-be-se"></div>
+        </figure>
+        <figure class="diag-cell">
+          <figcaption class="diag-title">Safety vs. Surplus</figcaption>
+          <figcaption class="diag-sub">CritViol% (x, lower is better) × SE⁺ (y).</figcaption>
+          <div class="chart-wrap" id="scatter-crit-se"></div>
+        </figure>
+        <figure class="diag-cell">
+          <figcaption class="diag-title">No-deal discipline vs. Surplus</figcaption>
+          <figcaption class="diag-sub">FAGR⁻ (x, lower is better) × SE⁺ (y).</figcaption>
+          <div class="chart-wrap" id="scatter-fagr-se"></div>
+        </figure>
+      </div>
+      <div class="diag-legend" id="diag-legend"></div>
+      <p class="section-footnote" id="diag-footnote"></p>
+    </section>
+
+    <!-- =============================================== System prompt -->
+    <section class="prompt-section" id="prompt-section">
+      <header class="section-head">
+        <h2>What the agent sees</h2>
+        <p class="section-caption">
+          Each agent is called via a single, deterministic JSON-in / JSON-out
+          contract. The system prompt below is identical across models
+          (buyer variant shown). Reasoning effort is set to the maximum
+          the provider supports.
+        </p>
+      </header>
+      <details class="prompt-block" id="prompt-block">
+        <summary>Show full system prompt</summary>
+        <pre class="prompt-pre" id="prompt-pre">Loading…</pre>
+      </details>
+    </section>
+
+    <!-- ===================================================== Traces -->
+    <section class="traces-section" id="traces-section">
+      <header class="section-head">
+        <h2>Selected traces</h2>
+        <p class="section-caption">
+          Three hand-picked episodes — one illustrating surplus capture,
+          one illustrating no-deal discipline, and one illustrating a
+          diagnostic failure. Each trace is the actual logged interaction,
+          unmodified.
+        </p>
+      </header>
+      <div class="trace-list" id="trace-list"></div>
+    </section>
+
+    <!-- ============================================================ Legend -->
+    <section class="legend" id="metrics-definitions">
+      <h2>Metrics</h2>
+      <dl>
+        <div class="legend-row">
+          <dt><code>SE⁺</code> — Feasible surplus efficiency</dt>
+          <dd>Fraction of available bargaining surplus captured on episodes
+            where a mutually rational deal exists. Higher is better.</dd>
+        </div>
+        <div class="legend-row">
+          <dt><code>AGR⁺</code> — Feasible agreement rate</dt>
+          <dd>Share of feasible episodes that terminate in an agreement.
+            Higher is better; low values flag over-rigid agents.</dd>
+        </div>
+        <div class="legend-row">
+          <dt><code>CSE⁺</code> — Conditional feasible deal quality</dt>
+          <dd><code>SE⁺</code> conditioned on an agreement being reached.
+            Isolates agents who agree often but settle for bad deals.</dd>
+        </div>
+        <div class="legend-row">
+          <dt><code>FAGR⁻</code> — No-deal false agreement rate</dt>
+          <dd>Share of infeasible episodes where the agent still agreed.
+            Lower is better; flags over-eager / over-concessive agents.</dd>
+        </div>
+        <div class="legend-row">
+          <dt><code>BE<sub>type</sub></code> — Belief error</dt>
+          <dd>Aggregate error on the agent's stated belief about counterpart
+            reservation value, urgency, and stance. Lower is better.</dd>
+        </div>
+        <div class="legend-row">
+          <dt><code>CritViol%</code> — Critical violations</dt>
+          <dd>Episodes with a price-bound, individual-rationality, or
+            invalid-action violation. Lower is better.</dd>
+        </div>
+        <div class="legend-row">
+          <dt><code>Ū</code> — Mean utility</dt>
+          <dd>Raw mean per-episode utility. Scale-dependent; kept as a
+            sanity column alongside the normalized metrics.</dd>
+        </div>
+      </dl>
+    </section>
+
+    <!-- ============================================================ Footer -->
+    <footer class="footer">
+      <div class="footer-line">
+        <span id="footer-run">TERMS-Bench</span>
+      </div>
+    </footer>
+  </main>
+
+  <script src="data.js?v=20260512-glm-grok-frontier"></script>
+  <script src="pg_overlay.js?v=20260512-pg-overlay"></script>
+  <script src="traces.js?v=20260506-gemma-surplus"></script>
+  <!-- Optional: commerce_data.js may not exist for runs that skipped commerce.
+       The onerror handler lets app.js detect the absence and hide the section. -->
+  <script src="commerce_data.js" onerror="window.__TERMS_COMMERCE_MISSING=true"></script>
+  <!-- Optional: bankroll_data.js — same pattern as commerce_data.js. -->
+  <script src="bankroll_data.js?v=20260512-bankroll-arxiv" onerror="window.__TERMS_BANKROLL_MISSING=true"></script>
+  <script src="app.js?v=20260512-footer-clean"></script>
+</body>
+</html>

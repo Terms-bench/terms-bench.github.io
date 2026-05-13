@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TERMS-Bench: Bargaining fingerprints</title>
+  <script>
+    // Resolve the theme before first paint so we never flash the wrong palette.
+    (function () {
+      try {
+        var saved = localStorage.getItem('terms-theme');
+        var theme = saved || (
+          window.matchMedia &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark' : 'light'
+        );
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <button class="theme-toggle" id="theme-toggle" type="button"
+          aria-label="Toggle color theme" title="Toggle light / dark">
+    <svg class="theme-icon theme-sun" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="4" fill="currentColor"></circle>
+      <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none">
+        <line x1="12" y1="2.5" x2="12" y2="5"></line>
+        <line x1="12" y1="19" x2="12" y2="21.5"></line>
+        <line x1="2.5" y1="12" x2="5" y2="12"></line>
+        <line x1="19" y1="12" x2="21.5" y2="12"></line>
+        <line x1="4.8" y1="4.8" x2="6.6" y2="6.6"></line>
+        <line x1="17.4" y1="17.4" x2="19.2" y2="19.2"></line>
+        <line x1="4.8" y1="19.2" x2="6.6" y2="17.4"></line>
+        <line x1="17.4" y1="6.6" x2="19.2" y2="4.8"></line>
+      </g>
+    </svg>
+    <svg class="theme-icon theme-moon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"
+            fill="currentColor"></path>
+    </svg>
+  </button>
+
+  <main class="page page-fingerprints">
+
+    <header class="masthead masthead-fingerprints">
+      <div class="masthead-row">
+        <h1 class="wordmark"><a class="wordmark-link" href="index.html">TERMS-Bench</a></h1>
+        <p class="page-eyebrow">Bargaining fingerprints</p>
+      </div>
+      <p class="page-lede">
+        One card per evaluated LLM agent: a strategic-profile snapshot
+        synthesising the numerical metrics with the trajectory typology,
+        safety profile, and oracle-bottleneck attribution from the paper.
+        Hand-picked superlatives flag where each agent stands out
+        (for better or worse) relative to the panel of
+        <span id="fp-agent-count" class="fp-meta-strong">—</span> evaluated
+        models. Avatar slots are reserved for future MBTI-style
+        illustrations.
+      </p>
+      <nav class="fp-back-nav" aria-label="Back to leaderboard">
+        <a href="index.html" class="fp-back-link">← Back to leaderboard</a>
+      </nav>
+    </header>
+
+    <section class="diagnoses-section diagnoses-page-section" id="diagnoses-section">
+      <div class="diagnoses-grid diagnoses-grid-wide" id="diagnoses-grid"></div>
+    </section>
+
+    <footer class="page-footer">
+      <div class="page-footer-meta">
+        <span>TERMS-Bench · bargaining fingerprints</span>
+      </div>
+      <nav class="footer-links">
+        <a href="index.html">Leaderboard</a>
+      </nav>
+    </footer>
+  </main>
+
+  <script src="data.js?v=20260512-glm-grok-frontier"></script>
+  <script src="diagnoses.js?v=20260512-fingerprints"></script>
+  <script src="pg_overlay.js?v=20260512-pg-overlay"></script>
+  <script src="fingerprints.js?v=20260512-pg-delta"></script>
+</body>
+</html>
