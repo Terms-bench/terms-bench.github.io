@@ -1210,8 +1210,43 @@ table.leaderboard {
   line-height: 1.5;
 }
 
+/* ---------------- Citation ---------------- */
+.citation-section {
+  margin-top: 56px;
+}
+.citation-section .section-caption a {
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.citation-bibtex {
+  margin: 0;
+  max-width: 100%;
+  padding: 18px 20px;
+  border: 1px solid var(--rule);
+  background: var(--code-bg);
+  color: var(--fg);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  text-align: left;
+  white-space: pre-wrap;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+.citation-bibtex code {
+  display: block;
+  font-family: inherit;
+  white-space: inherit;
+  overflow-wrap: inherit;
+  word-break: inherit;
+}
+
 @media (max-width: 640px) {
   .legend-row { grid-template-columns: 1fr; gap: 4px; }
+  .citation-section { margin-top: 44px; }
+  .citation-bibtex { padding: 14px 16px; font-size: 11.5px; }
   .hero { min-height: 0; margin-bottom: 56px; }
   .hero-eyebrow { margin-bottom: 20px; }
   .wordmark { font-size: 56px; margin-bottom: 12px; }
