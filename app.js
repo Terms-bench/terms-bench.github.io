@@ -111,7 +111,7 @@
     regime: "overall",
     sortKey: "se_plus",
     sortDir: "desc",
-    pageSize: 12,
+    pageSize: data.rows.length,
     page: 1,
   };
 
