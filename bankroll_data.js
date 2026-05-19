@@ -64,7 +64,7 @@ window.TERMS_BANKROLL_DATA = {
               "display": "GLM 5.1",
               "provider": "Zhipu",
               "provider_slug": "zhipu",
-              "kind": "frontier",
+              "kind": "open",
               "overall": {
                 "terminal_balance_mean_usd": 442.7720577065583,
                 "terminal_balance_sem_usd": 60.4637050870086,

@@ -293,7 +293,7 @@ window.TERMS_DATA = {
       "display": "GLM 5.1",
       "provider": "Zhipu",
       "provider_slug": "zhipu",
-      "kind": "frontier",
+      "kind": "open",
       "regimes": {
         "overall": {
           "mean_utility": 11.696256743843419,
