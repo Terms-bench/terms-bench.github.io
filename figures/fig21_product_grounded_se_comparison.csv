@@ -1,0 +1,12 @@
+model_key,label,category,se_plus,n_episodes,source
+gpt_4o_mini,GPT-4o-mini,subfrontier,0.08605315118373638,1664,final_results_product_grounded/gpt_4o_mini/metrics.json
+qwen,Qwen 3.6 Plus,open,0.4915704676204736,1649,final_results_product_grounded/qwen/metrics.json
+kimi,Kimi K2.6,open,0.49774676847353516,1648,final_results_product_grounded/kimi/metrics.json
+grok_4_20,Grok 4.20,frontier,0.5623303350449793,1647,final_results_product_grounded/grok_4_20/metrics.json
+deepseek,DeepSeek V4,open,0.6126274360449243,1650,final_results_product_grounded/deepseek/metrics.json
+gpt_5_5,GPT-5.5,frontier,0.6176796964665933,1646,final_results_product_grounded/gpt_5_5/metrics.json
+glm,GLM 5.1,open,0.6252780098043442,1646,final_results_product_grounded/glm/metrics.json
+gemma,Gemma 4 31B,open,0.6486448024853927,1644,final_results_product_grounded/gemma/metrics.json
+gemini_naci,Gemini 3.1 Pro,frontier,0.6707339271395814,1649,final_results_product_grounded/gemini_naci/metrics.json
+claude_aws,Claude Opus 4.7,frontier,0.6813346937321112,1646,final_results_product_grounded/claude_aws/metrics.json
+claude_opus_4_6,Claude Opus 4.6,frontier,0.7102791962817764,1643,final_results_product_grounded/claude_opus_4_6/metrics.json
