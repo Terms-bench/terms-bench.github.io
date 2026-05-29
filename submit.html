@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TERMS-Bench: Submit your model</title>
+  <script>
+    // Resolve the theme before first paint so we never flash the wrong palette.
+    (function () {
+      try {
+        var saved = localStorage.getItem('terms-theme');
+        var theme = saved || (
+          window.matchMedia &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark' : 'light'
+        );
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (_) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <button class="theme-toggle" id="theme-toggle" type="button"
+          aria-label="Toggle color theme" title="Toggle light / dark">
+    <svg class="theme-icon theme-sun" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="12" r="4" fill="currentColor"></circle>
+      <g stroke="currentColor" stroke-width="1.6" stroke-linecap="round" fill="none">
+        <line x1="12" y1="2.5" x2="12" y2="5"></line>
+        <line x1="12" y1="19" x2="12" y2="21.5"></line>
+        <line x1="2.5" y1="12" x2="5" y2="12"></line>
+        <line x1="19" y1="12" x2="21.5" y2="12"></line>
+        <line x1="4.8" y1="4.8" x2="6.6" y2="6.6"></line>
+        <line x1="17.4" y1="17.4" x2="19.2" y2="19.2"></line>
+        <line x1="4.8" y1="19.2" x2="6.6" y2="17.4"></line>
+        <line x1="17.4" y1="6.6" x2="19.2" y2="4.8"></line>
+      </g>
+    </svg>
+    <svg class="theme-icon theme-moon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4 8.5 8.5 0 1 0 20 14.5z"
+            fill="currentColor"></path>
+    </svg>
+  </button>
+
+  <main class="page page-submit">
+
+    <header class="masthead masthead-fingerprints">
+      <div class="masthead-row">
+        <h1 class="wordmark"><a class="wordmark-link" href="index.html">TERMS-Bench</a></h1>
+        <p class="page-eyebrow">Submit your model</p>
+      </div>
+      <p class="page-lede">
+        Want your model on the TERMS-Bench leaderboard? You provide the
+        API access; we run the full diagnostic suite on our backend and
+        publish the results. No local infra, no eval harness setup,
+        no GPU. Submissions typically run within 3-5 business days.
+      </p>
+      <nav class="fp-back-nav" aria-label="Back to leaderboard">
+        <a href="index.html" class="fp-back-link">&larr; Back to leaderboard</a>
+      </nav>
+    </header>
+
+    <!-- =========================================================== CTA -->
+    <section class="submit-cta">
+      <div class="submit-cta-card">
+        <h2 class="submit-cta-title">One submission, full diagnostic report</h2>
+        <p class="submit-cta-body">
+          Each accepted submission is evaluated on the full paper suite:
+          the <code>3 &times; 6</code> regime &times; family design matrix
+          across the bilateral price negotiation protocol. You receive
+          all four diagnostic axes (<code>SE&#8314;</code>,
+          <code>AGR&#8314;</code>, <code>FAGR&#8315;</code>,
+          <code>BE_type</code>, <code>CritViol%</code>), per-family
+          stratification, per-regime breakdowns, and a bargaining
+          fingerprint card. Cost is covered by your API key; we publish
+          aggregate spend so you know what to expect.
+        </p>
+        <p class="submit-cta-note">
+          Submissions are emailed to
+          <a href="mailto:submissions@terms-bench.org">submissions@terms-bench.org</a>.
+          For the API key we recommend a
+          <a href="https://onetimesecret.com" target="_blank" rel="noopener">
+          one-time secret link</a> (paste it in the notes field) so the
+          key never sits in your sent-mail archive. We use the key only
+          for the eval run, never log it, and recommend you create a
+          dedicated, scope-limited key with a hard spend cap.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================================================== How it works -->
+    <h2 class="submit-section-h">How submission works</h2>
+    <ol class="submit-steps">
+      <li>
+        <h3>1. Pick a provider</h3>
+        <p>
+          Any OpenAI-compatible chat-completions endpoint works:
+          OpenAI, Anthropic (via the dedicated route), OpenRouter,
+          Together, Fireworks, Groq, or your own self-hosted vLLM /
+          SGLang server with the OpenAI-compatible adapter.
+        </p>
+      </li>
+      <li>
+        <h3>2. Mint a dedicated API key</h3>
+        <p>
+          We recommend creating a fresh key with a hard spend cap
+          (typically $50-$200 covers the full paper suite, depending on
+          model). The key is transported over TLS, used by our eval
+          runner only, and never persisted to disk on our side.
+        </p>
+      </li>
+      <li>
+        <h3>3. Fill in the form and send the email</h3>
+        <p>
+          Fill in model identifier (e.g. <code>openai/gpt-5</code>,
+          <code>anthropic/claude-opus-4-7</code>,
+          <code>meta-llama/llama-4-70b-instruct</code>), provider, your
+          contact info, and any sampling notes. Hitting submit composes
+          an email to
+          <a href="mailto:submissions@terms-bench.org">submissions@terms-bench.org</a>
+          with everything pre-filled - review and send from your mail
+          client. For the API key, paste a one-time secret link in the
+          notes field (recommended) or include it directly if you accept
+          the risk.
+        </p>
+      </li>
+      <li>
+        <h3>4. We run the eval, you get the report</h3>
+        <p>
+          We run the full paper suite (single replicate, paper-aligned
+          cell sizes). Within 3-5 business days, you receive a private
+          report with all metrics, traces of representative episodes,
+          and the leaderboard PR for your sign-off before publishing.
+        </p>
+      </li>
+    </ol>
+
+    <!-- ===================================================== The form -->
+    <h2 class="submit-section-h">Submission</h2>
+    <form id="submit-form" class="submit-form" autocomplete="off" novalidate>
+      <div class="submit-form-row">
+        <div class="submit-field">
+          <label for="f-name" class="submit-field-label">
+            Your name<span class="submit-required">*</span>
+          </label>
+          <input id="f-name" name="submitter_name" class="submit-input"
+                 type="text" required maxlength="120" />
+        </div>
+        <div class="submit-field">
+          <label for="f-email" class="submit-field-label">
+            Contact email<span class="submit-required">*</span>
+          </label>
+          <input id="f-email" name="submitter_email" class="submit-input"
+                 type="email" required maxlength="200" />
+        </div>
+      </div>
+
+      <div class="submit-field">
+        <label for="f-affiliation" class="submit-field-label">
+          Affiliation
+        </label>
+        <input id="f-affiliation" name="affiliation" class="submit-input"
+               type="text" maxlength="200" placeholder="Optional, shown on leaderboard" />
+      </div>
+
+      <div class="submit-form-row">
+        <div class="submit-field">
+          <label for="f-display" class="submit-field-label">
+            Model display name<span class="submit-required">*</span>
+          </label>
+          <input id="f-display" name="display_name" class="submit-input"
+                 type="text" required maxlength="80"
+                 placeholder="e.g. Claude Opus 4.8" />
+          <span class="submit-field-hint">
+            Shown on the leaderboard exactly as written.
+          </span>
+        </div>
+        <div class="submit-field">
+          <label for="f-model" class="submit-field-label">
+            Model identifier<span class="submit-required">*</span>
+          </label>
+          <input id="f-model" name="model_id" class="submit-input"
+                 type="text" required maxlength="200"
+                 placeholder="e.g. anthropic/claude-opus-4-8" />
+          <span class="submit-field-hint">
+            The exact string passed to the provider's API.
+          </span>
+        </div>
+      </div>
+
+      <div class="submit-form-row">
+        <div class="submit-field">
+          <label for="f-provider" class="submit-field-label">
+            Provider<span class="submit-required">*</span>
+          </label>
+          <select id="f-provider" name="provider" class="submit-select" required>
+            <option value="">Select a provider</option>
+            <option value="openai">OpenAI</option>
+            <option value="anthropic">Anthropic</option>
+            <option value="openrouter">OpenRouter</option>
+            <option value="together">Together AI</option>
+            <option value="fireworks">Fireworks AI</option>
+            <option value="groq">Groq</option>
+            <option value="custom">Custom (OpenAI-compatible)</option>
+          </select>
+        </div>
+        <div class="submit-field">
+          <label for="f-base-url" class="submit-field-label">
+            API base URL
+          </label>
+          <input id="f-base-url" name="base_url" class="submit-input"
+                 type="url" maxlength="300"
+                 placeholder="Auto-detected from provider; override only if needed" />
+          <span class="submit-field-hint">
+            Required only for <code>custom</code> / self-hosted endpoints.
+          </span>
+        </div>
+      </div>
+
+      <div class="submit-field">
+        <label for="f-notes" class="submit-field-label">
+          Notes &mdash; API key delivery, sampling, reasoning
+          <span class="submit-required">*</span>
+        </label>
+        <textarea id="f-notes" name="notes" class="submit-textarea"
+                  required maxlength="2000" rows="5"
+                  placeholder='Recommended for the API key: paste a one-time secret link from https://onetimesecret.com or 1Password / Bitwarden Send.
+
+Optional sampling overrides:
+  {"temperature": 0.0, "reasoning_effort": "medium"}'></textarea>
+        <span class="submit-field-hint">
+          We default to <code>temperature=0.0</code> and the model's
+          standard reasoning mode unless you say otherwise. Recommended
+          API-key delivery: paste a one-time secret URL here (e.g. from
+          <a href="https://onetimesecret.com" target="_blank" rel="noopener">onetimesecret.com</a>)
+          so the raw key never lives in your sent-mail archive.
+        </span>
+      </div>
+
+      <label class="submit-consent">
+        <input id="f-consent" name="consent" type="checkbox" required />
+        <span>
+          I authorize TERMS-Bench to run the full paper suite using my
+          API access (typical cost <code>$50-$200</code>, charged to my
+          account), and to publish aggregate results on the public
+          leaderboard. I will receive a private report and the
+          leaderboard PR for sign-off before publication.
+        </span>
+      </label>
+
+      <div class="submit-actions">
+        <button type="submit" id="submit-btn" class="submit-submit-button">
+          Compose submission email
+        </button>
+        <span id="submit-status" class="submit-status" role="status" aria-live="polite"></span>
+      </div>
+
+      <p class="submit-field-hint" style="margin-top:8px;">
+        Prefer your own email client? Just email
+        <a href="mailto:submissions@terms-bench.org">submissions@terms-bench.org</a>
+        with the model identifier, provider, your contact, and a
+        one-time secret link for the API key.
+      </p>
+    </form>
+
+    <!-- ===================================================== Providers -->
+    <h2 class="submit-section-h">Supported providers</h2>
+    <section class="submit-providers">
+      <p class="submit-providers-lede">
+        Any of these work out of the box. <code>custom</code> covers
+        anything OpenAI-compatible (vLLM, SGLang, Ollama with the OpenAI
+        adapter, self-hosted endpoints).
+      </p>
+      <div class="provider-grid">
+        <div class="provider-card">
+          <h3 class="provider-name">OpenAI</h3>
+          <span class="provider-url">https://api.openai.com/v1</span>
+          <span class="provider-key">Header: <code>Authorization: Bearer sk-...</code></span>
+          <p class="provider-note">
+            Reasoning models (<code>o1</code>, <code>o3</code>,
+            <code>gpt-5</code> family) handled via the reasoning-effort
+            param; pass <code>reasoning_effort</code> in notes.
+          </p>
+        </div>
+        <div class="provider-card">
+          <h3 class="provider-name">Anthropic</h3>
+          <span class="provider-url">https://api.anthropic.com/v1</span>
+          <span class="provider-key">Header: <code>x-api-key: sk-ant-...</code></span>
+          <p class="provider-note">
+            Native client; thinking models (<code>claude-opus-4.x</code>)
+            run with extended thinking by default.
+          </p>
+        </div>
+        <div class="provider-card">
+          <h3 class="provider-name">OpenRouter</h3>
+          <span class="provider-url">https://openrouter.ai/api/v1</span>
+          <span class="provider-key">Header: <code>Authorization: Bearer sk-or-...</code></span>
+          <p class="provider-note">
+            Use the <code>vendor/model</code> identifier
+            (e.g. <code>meta-llama/llama-4-70b-instruct</code>).
+            Reasoning-capable routes auto-detected.
+          </p>
+        </div>
+        <div class="provider-card">
+          <h3 class="provider-name">Together AI</h3>
+          <span class="provider-url">https://api.together.xyz/v1</span>
+          <span class="provider-key">Header: <code>Authorization: Bearer ...</code></span>
+          <p class="provider-note">
+            OpenAI-compatible. Good for open-weight models.
+          </p>
+        </div>
+        <div class="provider-card">
+          <h3 class="provider-name">Fireworks AI</h3>
+          <span class="provider-url">https://api.fireworks.ai/inference/v1</span>
+          <span class="provider-key">Header: <code>Authorization: Bearer ...</code></span>
+          <p class="provider-note">
+            OpenAI-compatible. Fast open-weight inference.
+          </p>
+        </div>
+        <div class="provider-card">
+          <h3 class="provider-name">Groq</h3>
+          <span class="provider-url">https://api.groq.com/openai/v1</span>
+          <span class="provider-key">Header: <code>Authorization: Bearer gsk_...</code></span>
+          <p class="provider-note">
+            OpenAI-compatible. Low-latency inference.
+          </p>
+        </div>
+        <div class="provider-card provider-card-shim">
+          <h3 class="provider-name">Custom / self-hosted</h3>
+          <span class="provider-url">Any OpenAI-compatible URL</span>
+          <span class="provider-key">Header: <code>Authorization: Bearer ...</code> (or none)</span>
+          <p class="provider-note">
+            vLLM, SGLang, Ollama (OpenAI adapter), TGI, llama.cpp HTTP
+            server, etc. Provide a publicly reachable base URL.
+          </p>
+        </div>
+      </div>
+      <p class="provider-footnote">
+        Missing your provider? Pick <code>custom</code> and paste the
+        base URL, or reach out at
+        <a href="mailto:contact@terms-bench.org">contact@terms-bench.org</a>.
+      </p>
+    </section>
+
+    <!-- ===================================================== Notes -->
+    <h2 class="submit-section-h">Fine print</h2>
+    <ul class="submit-notes-list">
+      <li>
+        <strong>Cost.</strong> The full paper suite is roughly
+        <code>3 &times; 6 &times; 60</code> episodes &times; ~12 rounds &times;
+        ~600 tokens/round &asymp; <code>~7-8M tokens</code> total. Frontier
+        chat models land in the <code>$50-$120</code> range; reasoning
+        models with high effort can reach <code>$200+</code>.
+      </li>
+      <li>
+        <strong>Cadence.</strong> We batch submissions weekly. Expedited
+        runs (e.g. for paper deadlines) can be arranged - email
+        <a href="mailto:submissions@terms-bench.org">submissions@terms-bench.org</a>.
+      </li>
+      <li>
+        <strong>Re-runs.</strong> Each model gets one re-run per six
+        months (e.g. after a checkpoint update). Re-submit using the
+        same display name to overwrite; pick a new display name to keep
+        both versions on the leaderboard.
+      </li>
+      <li>
+        <strong>Embargo.</strong> If you need results held until a
+        publication deadline, mention it in the notes; we publish on
+        your timeline up to 60 days.
+      </li>
+      <li>
+        <strong>Reproducibility.</strong> Submissions ship with the
+        exact <code>termsbench/defaults.toml</code> hash and the run
+        manifest; everything is reproducible from the artifacts.
+      </li>
+      <li>
+        <strong>Get in touch.</strong> General queries, interest,
+        collaboration, or anything else - email
+        <a href="mailto:contact@terms-bench.org">contact@terms-bench.org</a>
+        and we'll do our best to get back.
+      </li>
+    </ul>
+
+  </main>
+
+  <script>
+    // Theme toggle: matches index.html behavior.
+    (function () {
+      var btn = document.getElementById('theme-toggle');
+      if (!btn) return;
+      btn.addEventListener('click', function () {
+        var current = document.documentElement.getAttribute('data-theme') || 'light';
+        var next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem('terms-theme', next); } catch (_) {}
+      });
+    })();
+
+    // Provider -> default base URL.
+    var PROVIDER_BASE_URLS = {
+      openai:     'https://api.openai.com/v1',
+      anthropic:  'https://api.anthropic.com/v1',
+      openrouter: 'https://openrouter.ai/api/v1',
+      together:   'https://api.together.xyz/v1',
+      fireworks:  'https://api.fireworks.ai/inference/v1',
+      groq:       'https://api.groq.com/openai/v1',
+      custom:     ''
+    };
+
+    var providerEl = document.getElementById('f-provider');
+    var baseUrlEl  = document.getElementById('f-base-url');
+    providerEl.addEventListener('change', function () {
+      var def = PROVIDER_BASE_URLS[providerEl.value] || '';
+      // Only autofill if the user hasn't typed something custom.
+      if (!baseUrlEl.value || Object.values(PROVIDER_BASE_URLS).indexOf(baseUrlEl.value) !== -1) {
+        baseUrlEl.value = def;
+      }
+    });
+
+    // The mailbox that accepts submissions.
+    var SUBMIT_EMAIL = 'submissions@terms-bench.org';
+
+    var form     = document.getElementById('submit-form');
+    var btn      = document.getElementById('submit-btn');
+    var statusEl = document.getElementById('submit-status');
+
+    function setStatus(state, msg) {
+      statusEl.textContent = msg || '';
+      if (state) statusEl.setAttribute('data-state', state);
+      else statusEl.removeAttribute('data-state');
+    }
+
+    function val(id) { return document.getElementById(id).value.trim(); }
+
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      if (!form.checkValidity()) {
+        setStatus('err', 'Please fill in all required fields.');
+        form.reportValidity();
+        return;
+      }
+      var displayName = val('f-display');
+      var subject = 'TERMS-Bench submission: ' + displayName;
+      var lines = [
+        'TERMS-Bench submission',
+        '======================',
+        '',
+        'Submitter:    ' + val('f-name'),
+        'Email:        ' + val('f-email'),
+        'Affiliation:  ' + (val('f-affiliation') || '(none)'),
+        '',
+        'Display name: ' + displayName,
+        'Model id:     ' + val('f-model'),
+        'Provider:     ' + val('f-provider'),
+        'Base URL:     ' + (val('f-base-url') || '(provider default)'),
+        '',
+        'Notes / API-key delivery / sampling overrides:',
+        '----------------------------------------------',
+        val('f-notes'),
+        '',
+        '-- ',
+        'I authorize TERMS-Bench to run the full paper suite using my ' +
+        'API access and to publish aggregate results on the public ' +
+        'leaderboard, with a private report and a leaderboard PR for ' +
+        'sign-off before publication.'
+      ];
+      var body = lines.join('\n');
+      var href = 'mailto:' + SUBMIT_EMAIL +
+                 '?subject=' + encodeURIComponent(subject) +
+                 '&body=' + encodeURIComponent(body);
+
+      // Hand off to the user's mail client.
+      window.location.href = href;
+      setStatus('ok',
+        'Email composed in your mail client. Review and send to ' + SUBMIT_EMAIL + '.');
+    });
+  </script>
+</body>
+</html>
