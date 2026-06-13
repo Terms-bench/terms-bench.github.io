@@ -2164,7 +2164,12 @@
     const id = row.id || "";
     const m = id.match(/^llm_([^_]+)_(.+)$/);
     const providerSlug = m ? m[1] : row.provider_slug || "";
-    const modelLower = m ? m[2].toLowerCase() : "";
+    // When the strict provider_underscore_model regex doesn't match — e.g.
+    // 2026-06 vintage IDs like `llm_claude-opus-4.7`, `llm_gpt-5.5`, or
+    // `llm_gemini-3.5-flash` that drop the provider prefix and use only
+    // dashes — fall back to the substring after `llm_` so the model-family
+    // heuristic below still gets a chance to match.
+    const modelLower = m ? m[2].toLowerCase() : id.replace(/^llm_/, "").toLowerCase();
     let candidate = null;
     if (modelLower.startsWith("claude")) candidate = "claude";
     else if (modelLower.startsWith("gemini")) candidate = "gemini";
